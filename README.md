@@ -88,5 +88,4 @@ La carpeta `SharedLayer` actúa como **capa** de utilidades comunes (por ejemplo
 from SharedLayer.DbConnector import DbConnector
 ```
 
-Si tus utilidades crecen, considera gestionarlas como paquete Python e instalarlo vía `pip install -e .`.
 
