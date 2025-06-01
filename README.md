@@ -3,9 +3,7 @@
 Boilerplate para una API **serverless** escrita en Python y desplegada en Azure Functions. Incluye conexión segura a **Azure SQL Database** y dos funciones de ejemplo:
 
 * **GET /status** – Verifica la salud del servicio.
-* **POST /records** – Inserta un registro en la tabla `SampleTable`.
-
-> Todo el código usa **CamelCase** conforme a la preferencia del proyecto.
+* **POST /records** – Inserta un registro en la tabla `pv_infoIA`.
 
 ## Prerrequisitos
 
@@ -40,8 +38,15 @@ npm install -g azure-functions-core-tools@4 --unsafe-perm true
    ```
 6. Prueba:
    ```bash
-   curl http://localhost:7071/api/status
-   curl -X POST http://localhost:7071/api/records -H "Content-Type: application/json" -d '{"name":"Alice","value":42}'
+    curl -X POST http://localhost:7071/api/records \
+        -H "Content-Type: application/json" \
+        -d '{
+              "infoId": 1,
+              "modeloIA": "gpt-4o",
+              "apiKey": "sk-XXXX",
+              "token": "someAuthToken",
+              "maxTokens": 4096
+            }'
    ```
 
 ## Despliegue en Azure
@@ -65,7 +70,7 @@ npm install -g azure-functions-core-tools@4 --unsafe-perm true
 3. Configura la cadena de conexión en la Function App:
    ```bash
    az functionapp config appsettings set --name VotoPuraVidaApi --resource-group VotoPuraVidaRG \
-      --settings "SqlConnectionString=Driver={ODBC Driver 18 for SQL Server};Server=tcp:votopuravidasqlsrv.database.windows.net,1433;Database=VotoPuraVidaDB;Uid=sqladmin;Pwd=<StrongPass123>;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+      --settings "SqlConnectionString=Driver={ODBC Driver 18 for SQL Server};Server=tcp:votopuravidasqlsrv.database.windows.net,1433;Database=VotoPV;Uid=sqladmin;Pwd=<StrongPass123>;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
    ```
 4. Publica el código:
    ```bash
@@ -85,9 +90,3 @@ from SharedLayer.DbConnector import DbConnector
 
 Si tus utilidades crecen, considera gestionarlas como paquete Python e instalarlo vía `pip install -e .`.
 
-## Buenas prácticas
-
-* Mantén **local.settings.json** fuera de control de versiones.
-* Utiliza **slot settings** o Azure Key Vault para secretos.
-* Activa el firewall de Azure SQL permitiendo solo la IP de Azure Functions.
-* Habilita Application Insights para monitoreo.

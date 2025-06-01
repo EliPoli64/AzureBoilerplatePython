@@ -5,26 +5,35 @@ from typing import Any, Dict, Tuple
 from SharedLayer.DbConnector import DbConnector
 
 _INSERT_SQL = """
-INSERT INTO SampleTable (Name, Value) VALUES (?, ?);
+INSERT INTO dbo.pv_infoIA (infoId, modeloIA, apiKey, token, maxTokens)
+VALUES (?, ?, ?, ?, ?);
 """
 
 
-def _validateBody(body: Dict[str, Any]) -> Tuple[str, int]:
-    if not {"name", "value"}.issubset(body.keys()):
-        raise ValueError("JSON must contain 'name' and 'value'.")
-    return str(body["name"]), int(body["value"])
+def _validateBody(body: Dict[str, Any]) -> Tuple[int, str, str, str, int]:
+    requiredKeys = {"infoId", "modeloIA", "apiKey", "token", "maxTokens"}
+    if not requiredKeys.issubset(body.keys()):
+        raise ValueError("JSON must contain 'infoId', 'modeloIA', 'apiKey', 'token' and 'maxTokens'.")
+
+    return (
+        int(body["infoId"]),
+        str(body["modeloIA"]),
+        str(body["apiKey"]),
+        str(body["token"]),
+        int(body["maxTokens"]),
+    )
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:  # noqa: N802
-    """POST /records – Inserts a record into Azure SQL."""
+    """POST /records – Inserts a record into dbo.pv_infoIA."""
     try:
         body = req.get_json()
-        name, value = _validateBody(body)
+        recordParams = _validateBody(body)
 
         dbConnector = DbConnector()
-        dbConnector.executeQuery(_INSERT_SQL, (name, value))
+        dbConnector.executeQuery(_INSERT_SQL, recordParams)
 
-        responseBody = {"message": "Record created successfully."}
+        responseBody = {"message": "Registro creado en pv_infoIA correctamente."}
         return func.HttpResponse(
             json.dumps(responseBody),
             mimetype="application/json",
@@ -36,7 +45,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:  # noqa: N802
             mimetype="application/json",
             status_code=400,
         )
-    except Exception as exc:  # noqa: BLE001
+    except Exception:  # noqa: BLE001
         return func.HttpResponse(
             json.dumps({"error": "Internal server error."}),
             mimetype="application/json",
