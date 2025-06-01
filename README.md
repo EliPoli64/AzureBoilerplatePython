@@ -1,91 +1,132 @@
-# VotoPuraVida – Azure Functions Boilerplate
+# Voto Pura Vida - API Serverless en Python
 
-Boilerplate para una API **serverless** escrita en Python y desplegada en Azure Functions. Incluye conexión segura a **Azure SQL Database** y dos funciones de ejemplo:
+Este proyecto es una implementación local de un API serverless desarrollado en Python. El sistema gestiona funciones críticas de un sistema de votación electrónica y crowdfunding, utilizando procedimientos almacenados (Stored Procedures) y ORM (SQLAlchemy) sobre SQL Server. 
 
-* **GET /status** – Verifica la salud del servicio.
-* **POST /records** – Inserta un registro en la tabla `pv_infoIA`.
+El enfoque está alineado con tecnologías cloud (como AWS Lambda o Azure Functions), pero el despliegue es 100% local para facilitar la colaboración y portabilidad entre desarrolladores.
 
-## Prerrequisitos
+## Estructura del Proyecto
 
-| Herramienta | Versión mínima |
-|-------------|---------------|
-| Python      | 3.11          |
-| Azure CLI   | 2.60          |
-| Azure Functions Core Tools | 4.x |
-| ODBC Driver | 18 para SQL Server |
+```
+APIs/
+├── CS/                     # Versión original en C# (para referencia)
+├── PY/                     # API actual implementada en Python
+│   ├── app/                # Código fuente de la API
+│   │   ├── main.py         # Punto de entrada con FastAPI
+│   │   ├── database.py     # Conexión asíncrona y modelo base
+│   │   ├── models.py       # Declaración de modelos ORM
+│   │   ├── schemas.py      # Esquemas Pydantic
+│   │   ├── crud/           # Funciones ORM
+│   │   ├── stored_procedures.py  # Llamadas a SPs vía pyodbc
+│   │   └── routers/        # Archivos de endpoints separados por tipo
+│   ├── tests/              # Pruebas automatizadas
+│   └── .env                # Variables de entorno (no subir al repo)
+```
 
-Instala Core Tools (Windows ➜ MSI, macOS/Linux ➜ npm):
+## Requisitos
+
+- Python 3.10+
+- SQL Server 2019 o superior
+- Controlador ODBC para SQL Server
+- `pyodbc`, `SQLAlchemy`, `FastAPI`, `uvicorn`, `python-dotenv`
+
+## Instalación
+
+1. Clona el repositorio:
+
 ```bash
-npm install -g azure-functions-core-tools@4 --unsafe-perm true
+git clone https://github.com/tu-usuario/Caso3Bases.git
+cd Caso3Bases/APIs/PY
 ```
 
-## Configuración local
+2. Crea y activa un entorno virtual:
 
-1. **Clona el repo** y navega al directorio raíz.
-2. Crea un entorno virtual y activa:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
-   ```
+```bash
+python -m venv venv
+source venv/bin/activate   # En Windows: venv\Scripts\activate
+```
+
 3. Instala dependencias:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Copia `local.settings.json` > `local.settings.json.user` y rellena `SqlConnectionString`.
-5. Inicia la función local:
-   ```bash
-   func start
-   ```
-6. Prueba:
-   ```bash
-    curl -X POST http://localhost:7071/api/records \
-        -H "Content-Type: application/json" \
-        -d '{
-              "infoId": 1,
-              "modeloIA": "gpt-4o",
-              "apiKey": "sk-XXXX",
-              "token": "someAuthToken",
-              "maxTokens": 4096
-            }'
-   ```
 
-## Despliegue en Azure
-
-1. Inicia sesión y selecciona el subscription:
-   ```bash
-   az login
-   az account set --subscription "<SUB_ID>"
-   ```
-2. Crea recursos (Grupo, Plan de Consumo, Function App y Azure SQL):
-   ```bash
-   az group create --name VotoPuraVidaRG --location eastus
-   az storage account create --name votopuravidastor --location eastus --resource-group VotoPuraVidaRG --sku Standard_LRS
-   az functionapp create --resource-group VotoPuraVidaRG --consumption-plan-location eastus \
-      --runtime python --functions-version 4 --name VotoPuraVidaApi \
-      --storage-account votopuravidastor
-   az sql server create --name votopuravidasqlsrv --resource-group VotoPuraVidaRG --location eastus \
-      --admin-user sqladmin --admin-password "<StrongPass123>"
-   az sql db create --resource-group VotoPuraVidaRG --server votopuravidasqlsrv --name VotoPuraVidaDB --service-objective S0
-   ```
-3. Configura la cadena de conexión en la Function App:
-   ```bash
-   az functionapp config appsettings set --name VotoPuraVidaApi --resource-group VotoPuraVidaRG \
-      --settings "SqlConnectionString=Driver={ODBC Driver 18 for SQL Server};Server=tcp:votopuravidasqlsrv.database.windows.net,1433;Database=VotoPV;Uid=sqladmin;Pwd=<StrongPass123>;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
-   ```
-4. Publica el código:
-   ```bash
-   func azure functionapp publish VotoPuraVidaApi --python
-   ```
-5. Verifica endpoints:
-   ```bash
-   curl https://VotoPuraVidaApi.azurewebsites.net/api/status
-   ```
-
-## Capas compartidas
-
-La carpeta `SharedLayer` actúa como **capa** de utilidades comunes (por ejemplo, `DbConnector`). Simplemente importa desde cualquier función:
-```python
-from SharedLayer.DbConnector import DbConnector
+```bash
+pip install -r requirements.txt
 ```
+
+4. Crea un archivo `.env` en `APIs/PY/` con el siguiente contenido:
+
+```ini
+SqlConnectionString=DRIVER={ODBC Driver 17 for SQL Server};SERVER=localhost;DATABASE=VotoPuraVida;UID=sa;PWD=tu_password_segura
+```
+
+5. Ejecuta las migraciones iniciales (si se incluyen):
+
+```bash
+alembic upgrade head  # si usas Alembic para migraciones
+```
+
+## Ejecución local
+
+```bash
+uvicorn app.main:app --reload
+```
+
+La API estará disponible en:
+
+```
+http://localhost:8000
+```
+
+La documentación generada estará en:
+
+```
+http://localhost:8000/docs
+```
+
+## Endpoints implementados
+
+### Con procedimientos almacenados (Stored Procedures)
+
+- `POST /sp/crearActualizarPropuesta`
+- `POST /sp/revisarPropuesta`
+- `POST /sp/invertir`
+- `POST /sp/repartirDividendos`
+
+### Con ORM
+
+- `POST /orm/votar`
+- `POST /orm/comentar`
+- `GET  /orm/listarVotos`
+- `POST /orm/configurarVotacion`
+
+Cada uno de estos endpoints ejecuta validaciones, transacciones y lógica de seguridad tal como se detalla en los requisitos del prototipo.
+
+## Seguridad
+
+- Validación de identidad por tokens o JWT
+- Autenticación multifactor (MFA) en endpoints críticos
+- Cifrado de votos y documentos sensibles
+- Validaciones de rol, permisos y trazabilidad en todos los endpoints
+
+## Base de Datos
+
+La base de datos SQL Server debe contener:
+- Procedimientos almacenados documentados en `scripts/sql/`
+- Tablas normalizadas y relaciones según el diseño
+- Historial de cambios, control de estados y bitácoras
+
+## Scripts útiles
+
+```bash
+python scripts/test_connection.py
+
+pytest tests/
+```
+
+## Integración con IA
+
+Se dejan estructuras preparadas para validación por LLMs o clasificadores automáticos (por ejemplo, `reviewPayload`), especialmente en endpoints como `revisarPropuesta` y `comentar`.
+
+## Despliegue
+
+Aunque la arquitectura es serverless, se ejecuta localmente para facilitar pruebas, colaboración y despliegue sin necesidad de servicios cloud externos.
 
 
