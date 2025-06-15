@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=c:\Users\elias\OneDrive - Estudiantes ITCR\4. TEC\Bases I\AzureFunctionsBoilerplate\AzureBoilerplatePython\.venv"
+set "VIRTUAL_ENV=C:\Users\elias\OneDrive\Documentos\GitHub\Caso3Bases\APIs\Python\.venv"
 
 if not defined PROMPT set PROMPT=$P$G
 
