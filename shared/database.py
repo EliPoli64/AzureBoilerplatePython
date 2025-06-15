@@ -1,13 +1,29 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
-import os
+import urllib.parse
 
-_SQL_CONN = os.getenv("SqlConnectionString")
-if not _SQL_CONN:
-    raise ValueError("SqlConnectionString environment variable is not set.")
-ASYNC_URL = f"mssql+pyodbc:///?odbc_connect={_SQL_CONN.replace(' ', '+')}"
+# reemplazar esto por los valores reales
+server = "localhost"
+port = 1433
+database = "VotoPV"
+username = "ELIPOLIMSI"
+password = "ITECssogy64*"
+driver = "ODBC Driver 17 for SQL Server"
 
-engine = create_async_engine(ASYNC_URL, echo=False, future=True)
+rawConnString = (
+    f"DRIVER={{{driver}}};"
+    f"SERVER={server},{port};"
+    f"DATABASE={database};"
+    f"UID={username};"
+    f"PWD={password};"
+    f"TrustServerCertificate=yes;"
+)
+
+encodedConnString = urllib.parse.quote_plus(rawConnString)
+
+asyncUrl = f"mssql+pyodbc:///?odbc_connect={encodedConnString}"
+
+engine = create_async_engine(asyncUrl, echo=False, future=True)
 
 SessionLocal: async_sessionmaker[AsyncSession] = async_sessionmaker(
     engine,

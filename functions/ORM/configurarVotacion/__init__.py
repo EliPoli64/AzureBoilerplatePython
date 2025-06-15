@@ -9,7 +9,6 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse("id inválido", status_code=400)
 
     body = await req.get_json()
-    # aquí validarías reglas complejas; por simplicidad, solo marcamos estado
     async for session in get_session():
         async with session.begin():
             await session.execute(
