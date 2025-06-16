@@ -19,7 +19,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(e.json(), status_code=400, mimetype="application/json")
 
     try:
-        async for session in get_session():
+        async with get_session() as session:
             async with session.begin():
                 detalle = DetalleComentarios(
                     titulo=dto.titulo,
@@ -37,8 +37,6 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
                     propuestaId=dto.propuestaId,
                 )
                 session.add(comentario)
-            # commit implícito al salir del session.begin()
-            break  # sólo usar la primera sesión del generator
 
         return func.HttpResponse(
             json.dumps({"msg": "Comentario registrado correctamente"}),

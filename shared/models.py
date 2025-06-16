@@ -1,6 +1,7 @@
 from sqlalchemy import (
     Boolean,
     Column,
+    ForeignKey,
     Integer,
     LargeBinary,
     String,
@@ -32,13 +33,12 @@ class DetalleComentarios(Base):
 
     detalleComentarioId = Column(Integer, primary_key=True, autoincrement=True)
     titulo = Column(String(100), nullable=False)
-    cuerpo = Column(String, nullable=False)  # varchar(max)
+    cuerpo = Column(String, nullable=False)
     fechaPublicacion = Column(DateTime, nullable=False, default=datetime.utcnow)
     usuarioId = Column(Integer, nullable=False)
     organizacionId = Column(Integer, nullable=True)
 
-    # Relaciones (opcional, si usás ComentarioPropuesta u otros modelos)
-    comentariosPropuesta = relationship("PvComentariosPropuesta", backref="detalleComentario", cascade="all, delete-orphan")
+    comentariosPropuesta = relationship("ComentarioPropuesta", back_populates="detalleComentario", cascade="all, delete-orphan")
 
 class Votacion(Base):
     __tablename__ = "pv_votacion"
@@ -59,9 +59,12 @@ class ComentarioPropuesta(Base):
     __tablename__ = "pv_comentariosPropuesta"
 
     comentarioId = Column(Integer, primary_key=True, autoincrement=True)
-    detalleComentarioId = Column(Integer, nullable=False)
+    detalleComentarioId = Column(Integer, ForeignKey("pv_detalleComentarios.detalleComentarioId"), nullable=False)
     estadoComentId = Column(Integer, nullable=False)
-    propuestaId = Column(Integer, nullable=False)
+    propuestaId = Column(Integer, ForeignKey("pv_propuestas.propuestaId"), nullable=False)
+
+    # Relación inversa
+    detalleComentario = relationship("DetalleComentarios", back_populates="comentariosPropuesta")
 
 
 class Inversion(Base):
