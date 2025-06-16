@@ -16,28 +16,39 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     try:
         dto = ComentarioDTO(**req.get_json())
     except ValidationError as e:
-        return func.HttpResponse(e.json(), status_code=400)
-    async for session in get_session():
-        async with session.begin():
-            detalle = DetalleComentarios(
-                titulo=dto.titulo,
-                cuerpo=dto.cuerpo,
-                fechaPublicacion=datetime.utcnow(),
-                usuarioId=dto.usuarioId,
-                organizacionId=dto.organizacionId,  # puede ser None
-            )
-            session.add(detalle)
-            await session.flush()  
-            comentario = ComentarioPropuesta(
-                detalleComentarioId=detalle.detalleComentarioId,
-                estadoComentId=1,
-                propuestaId=dto.propuestaId,
-            )
-            session.add(comentario)
-        await session.commit()
+        return func.HttpResponse(e.json(), status_code=400, mimetype="application/json")
 
-    return func.HttpResponse(
-        json.dumps({"msg": "Comentario registrado correctamente"}),
-        mimetype="application/json",
-        status_code=201,
-    )
+    try:
+        async for session in get_session():
+            async with session.begin():
+                detalle = DetalleComentarios(
+                    titulo=dto.titulo,
+                    cuerpo=dto.cuerpo,
+                    fechaPublicacion=datetime.utcnow(),
+                    usuarioId=dto.usuarioId,
+                    organizacionId=dto.organizacionId,
+                )
+                session.add(detalle)
+                await session.flush()
+
+                comentario = ComentarioPropuesta(
+                    detalleComentarioId=detalle.detalleComentarioId,
+                    estadoComentId=1,
+                    propuestaId=dto.propuestaId,
+                )
+                session.add(comentario)
+            # commit implícito al salir del session.begin()
+            break  # sólo usar la primera sesión del generator
+
+        return func.HttpResponse(
+            json.dumps({"msg": "Comentario registrado correctamente"}),
+            mimetype="application/json",
+            status_code=201,
+        )
+
+    except Exception as ex:
+        return func.HttpResponse(
+            json.dumps({"error": str(ex)}),
+            mimetype="application/json",
+            status_code=500,
+        )
