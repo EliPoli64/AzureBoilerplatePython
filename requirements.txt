@@ -3,3 +3,4 @@ pyodbc
 SQLAlchemy
 pydantic
 python-dotenv
+aioodbc
