@@ -26,3 +26,19 @@ class ComentarioDTO(BaseModel):
 
     class Config:
         orm_mode = True
+
+class CrearActualizarPropuestaDTO(BaseModel):
+    PropuestaID: Optional[int] = None
+    CategoriaID: int
+    Descripcion: str
+    ImgURL: Optional[str] = None
+    FechaInicio: Optional[str] = None  # ISO string o None
+    FechaFin: Optional[str] = None
+    Comentarios: int
+    TipoPropuestaID: int
+    OrganizacionID: int
+    SegmentosDirigidosJS: str  # JSON string
+    SegmentosImpactoJS: str    # JSON string
+    AdjuntosJS: str            # JSON string
+    UsuarioAccion: int
+    EquipoOrigen: str
