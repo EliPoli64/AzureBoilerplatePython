@@ -65,3 +65,24 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=500,
         )
+
+"""
+ejemplo de uso:
+{
+  "PropuestaID": null,
+  "CategoriaID": 3,
+  "Descripcion": "Propuesta para mejorar la infraestructura tecnológica",
+  "ImgURL": "https://example.com/imagen.jpg",
+  "FechaInicio": null,
+  "FechaFin": "2025-12-31T23:59:59",
+  "Comentarios": true,
+  "TipoPropuestaID": 2,
+  "OrganizacionID": 162,
+  "SegmentosDirigidosJS": "[1,2,3]",
+  "SegmentosImpactoJS": "[4,5]",
+  "AdjuntosJS": "[{\"nombre\": \"documento1.pdf\", \"tipoDocumentoID\": 1, \"idLegal\": \"123456789\"}, {\"nombre\": \"documento2.pdf\", \"tipoDocumentoID\": 2, \"idLegal\": \"987654321\"}]",
+  "UsuarioAccion": 10,
+  "EquipoOrigen": "ServidorApp01"
+}
+
+"""
