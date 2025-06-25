@@ -163,3 +163,14 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json",
         status_code=201,
     )
+
+"""
+ejemplo de uso:
+{
+  "titulo": "Opinión sobre la propuesta X",
+  "cuerpo": "Este comentario incluye un documento sensible que debe ser analizado.",
+  "usuarioId": 42,
+  "organizacionId": 1,
+  "propuestaId": 40
+}
+"""
