@@ -1,44 +1,15 @@
 from sqlalchemy import (
+    VARBINARY,
     Boolean,
     Column,
     ForeignKey,
     Integer,
-    LargeBinary,
     String,
     DateTime,
 )
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base
-
-
-class Propuesta(Base):
-    __tablename__ = "pv_propuestas"
-
-    propuestaId = Column(Integer, primary_key=True, autoincrement=True)
-    categoriaId = Column(Integer, nullable=False)
-    descripcion = Column(String(200), nullable=True)
-    imgURL = Column(String(300), nullable=True)
-    fechaInicio = Column(DateTime, nullable=False, default=datetime.utcnow)
-    userId = Column(Integer, nullable=False)
-    fechaFin = Column(DateTime, nullable=True)
-    checksum = Column(LargeBinary(300), nullable=False)
-    comentarios = Column(Boolean, nullable=False)
-    tipoPropuestaId = Column(Integer, nullable=False)
-    estadoId = Column(Integer, nullable=False)
-    organizacionId = Column(Integer, nullable=True)
-
-class DetalleComentarios(Base):
-    __tablename__ = "pv_detalleComentarios"
-
-    detalleComentarioId = Column(Integer, primary_key=True, autoincrement=True)
-    titulo = Column(String(100), nullable=False)
-    cuerpo = Column(String, nullable=False)
-    fechaPublicacion = Column(DateTime, nullable=False, default=datetime.utcnow)
-    usuarioId = Column(Integer, nullable=False)
-    organizacionId = Column(Integer, nullable=True)
-
-    comentariosPropuesta = relationship("ComentarioPropuesta", back_populates="detalleComentario", cascade="all, delete-orphan")
 
 class Votacion(Base):
     __tablename__ = "pv_votacion"
@@ -55,18 +26,6 @@ class Votacion(Base):
     privada = Column(Boolean, nullable=False)
     esSecreta = Column(Boolean, nullable=False)
 
-class ComentarioPropuesta(Base):
-    __tablename__ = "pv_comentariosPropuesta"
-
-    comentarioId = Column(Integer, primary_key=True, autoincrement=True)
-    detalleComentarioId = Column(Integer, ForeignKey("pv_detalleComentarios.detalleComentarioId"), nullable=False)
-    estadoComentId = Column(Integer, nullable=False)
-    propuestaId = Column(Integer, ForeignKey("pv_propuestas.propuestaId"), nullable=False)
-
-    # Relación inversa
-    detalleComentario = relationship("DetalleComentarios", back_populates="comentariosPropuesta")
-
-
 class Inversion(Base):
     __tablename__ = "pv_inversion"
 
@@ -75,3 +34,86 @@ class Inversion(Base):
     usuarioId = Column(Integer, nullable=False)
     transaccionId = Column(Integer, nullable=False)
     organizacionId = Column(Integer, nullable=True)
+
+class Propuesta(Base):
+    __tablename__ = 'pv_propuestas'
+    propuestaid = Column(Integer, primary_key=True)
+    comentarios = Column(Boolean)
+
+class DetalleComentarios(Base):
+    __tablename__ = 'pv_detalleComentarios'
+    detalleComentarioId = Column(Integer, primary_key=True)
+    titulo = Column(String)
+    cuerpo = Column(String)
+    fechaPublicacion = Column(DateTime)
+    usuarioId = Column(Integer)
+    organizacionId = Column(Integer)
+
+class ComentarioPropuesta(Base):
+    __tablename__ = 'pv_comentariosPropuesta'
+    comentarioid = Column(Integer, primary_key=True)
+    detalleComentarioId = Column(Integer)
+    estadoComentId = Column(Integer)
+    propuestaId = Column(Integer)
+
+class EstadoComentario(Base):
+    __tablename__ = 'pv_estadoComentarios'
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String)
+
+class Documento(Base):
+    __tablename__ = 'pv_documento'
+    documentoID = Column(Integer, primary_key=True)
+    nombre = Column(String)
+    fechaCreacion = Column(DateTime)
+    tipoDocumentoID = Column(Integer)
+    estadoDocumentoID = Column(Integer)
+    ultimaModificacion = Column(DateTime)
+    esActual = Column(Boolean)
+    idLegal = Column(String)
+    checksum = Column(VARBINARY)
+
+class IaAnalisis(Base):
+    __tablename__ = 'pv_iaAnalisis'
+    analisisId = Column(Integer, primary_key=True)
+    fechaSolicitud = Column(DateTime)
+    iaEstadoID = Column(Integer)
+    fechaComienzo = Column(DateTime)
+    fechaFinalizacion = Column(DateTime)
+    infoid = Column(Integer)
+    contextoID = Column(Integer)
+    documentoID = Column(Integer)
+
+class Log(Base):
+    __tablename__ = 'pv_logs'
+    logid = Column(Integer, primary_key=True)
+    descripcion = Column(String)
+    timestamp = Column(DateTime)
+    computador = Column(String)
+    usuario = Column(String)
+    trace = Column(String)
+    refId1 = Column(Integer)
+    refId2 = Column(Integer)
+    valor1 = Column(String)
+    valor2 = Column(String)
+    checksum = Column(VARBINARY)
+    tipologid = Column(Integer)
+    origenlogid = Column(Integer)
+    logseveridadid = Column(Integer)
+
+class Usuario(Base):
+    __tablename__ = 'pv_usuarios'
+    userid = Column(Integer, primary_key=True)
+
+class Permiso(Base):
+    __tablename__ = 'pv_permissions'
+    permissionId = Column(Integer, primary_key=True)
+    code = Column(String)
+
+class UsuarioPermiso(Base):
+    __tablename__ = 'pv_usuariosPermisos'
+    permisoUsuarioId = Column(Integer, primary_key=True)
+    userid = Column(Integer, ForeignKey('pv_usuarios.userid'))
+    permisoId = Column(Integer, ForeignKey('pv_permissions.permissionId'))
+    enabled = Column(Boolean)
+    deleted = Column(Boolean)
