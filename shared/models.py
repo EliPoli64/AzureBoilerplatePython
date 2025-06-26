@@ -216,3 +216,6 @@ class Inversion(Base):
     usuarioId = Column(Integer, nullable=False)
     transaccionId = Column(Integer, nullable=False)
     organizacionId = Column(Integer, nullable=True)
+
+class Documento(Base): 
+     True
