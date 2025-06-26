@@ -4,6 +4,7 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
     DateTime,
 )
@@ -26,6 +27,19 @@ class Votacion(Base):
     privada = Column(Boolean, nullable=False)
     esSecreta = Column(Boolean, nullable=False)
 
+class Voto(Base):
+    __tablename__ = "pv_respuestaParticipante"
+
+    respuestaParticipanteID = Column(Integer, primary_key=True, autoincrement=True)
+    preguntaID = Column(Integer, nullable=False)
+    respuestaID = Column(Integer, nullable=False)
+    checksum = Column(LargeBinary(500), nullable=False)
+    valor = Column(String(500), nullable=False)
+    fechaRespuesta = Column(DateTime, nullable=True)
+    ncRespuesta = Column(LargeBinary(256), nullable=False)
+    tokenGUID =  Column(String(36), nullable=False, unique=True) #Manera de emular el Unique Identifier
+    pesoRespuesta = Column(Integer, nullable=False)
+    
 class Inversion(Base):
     __tablename__ = "pv_inversion"
 

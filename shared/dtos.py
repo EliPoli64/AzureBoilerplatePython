@@ -12,11 +12,6 @@ class InversionDTO(BaseModel):
     usuario_id: int
     monto: float
 
-class VotoDTO(BaseModel):
-    propuesta_id: int
-    usuario_id: int
-    voto_plano: str
-
 class ComentarioDTO(BaseModel):
     titulo: str
     cuerpo: str
@@ -39,3 +34,9 @@ class CrearActualizarPropuestaDTO(BaseModel):
     AdjuntosJS: str            # JSON string
     UsuarioAccion: int
     EquipoOrigen: str
+
+class VotoDTO(BaseModel):
+    preguntaID: int = Field(..., description = "ID de la pregunta a contestar")
+    respuestaID: int = Field(..., description = "ID de la respuesta con la que se contestará")
+    valor: str = Field(..., max_length=100, description="Contenido de la respuesta")
+    pesoRespuesta: int = Field(..., description = "ID del peso de la respuesta")
