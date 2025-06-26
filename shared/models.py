@@ -131,3 +131,34 @@ class UsuarioPermiso(Base):
     permisoId = Column(Integer, ForeignKey('pv_permissions.permissionId'))
     enabled = Column(Boolean)
     deleted = Column(Boolean)
+
+class TipoVotacion(Base):
+    _tablename_ = 'pv_tipoVotacion'
+    tipoVotacionId = Column(Integer, primary_key=True)
+    nombre = Column(String(100))
+    descripcion = Column(String(500))
+
+class Pregunta(Base):
+    _tablename_ = 'pv_preguntas'
+    preguntaId = Column(Integer, primary_key=True)
+    enunciado = Column(String(500))
+    tipoPreguntaId = Column(Integer)
+    maxSelecciones = Column(Integer)
+    fechaPublicacion = Column(DateTime)
+    deleted = Column(Boolean)
+    order = Column(Integer)
+
+class Respuesta(Base):
+    _tablename_ = 'pv_respuestas'
+    respuestaId = Column(Integer, primary_key=True)
+    preguntaId = Column(Integer, ForeignKey('pv_preguntas.preguntaId'))
+    respuesta = Column(String(50))
+    value = Column(String(100))
+    order = Column(Integer)
+    deleted = Column(Boolean)
+
+class VotacionPregunta(Base):
+    _tablename_ = 'pv_votacionPregunta'
+    votacionPreguntaId = Column(Integer, primary_key=True)
+    votacionId = Column(Integer, ForeignKey('pv_votacion.votacionId'))
+    preguntaId = Column(Integer, ForeignKey('pv_preguntas.preguntaId'))
