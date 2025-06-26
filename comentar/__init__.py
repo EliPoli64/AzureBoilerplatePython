@@ -1,6 +1,8 @@
 import json
 import azure.functions as func
 from datetime import datetime
+
+import sqlalchemy.ext.asyncio
 from shared.dtos import ComentarioDTO
 from shared.database import get_session
 from shared.models import (
@@ -33,7 +35,7 @@ def analizarContenido(titulo: str, cuerpo: str) -> dict:
     return {"valido": True, "sensible": bool(sensible)}
 
 
-async def usuarioEsValido(session, usuarioId: int, permisoCode) -> bool:
+async def usuarioEsValido(session: sqlalchemy.ext.asyncio.AsyncSession, usuarioId: int, permisoId: int) -> bool:
     stmt = (
         select(Usuario)
         .join(UsuarioPermiso)
@@ -43,9 +45,9 @@ async def usuarioEsValido(session, usuarioId: int, permisoCode) -> bool:
             UsuarioPermiso.deleted == False,
         )
     )
-
-    if permisoCode:
-        stmt = stmt.join(Permiso).where(Permiso.code == permisoCode)
+    print(str(permisoId)+" kjabsdchjkabsckjb")
+    if permisoId:
+        stmt = stmt.join(Permiso).where(Permiso.permissionId == permisoId)
 
     result = await session.execute(stmt)
     return result.scalar() is not None
@@ -62,7 +64,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     async with get_session() as session:
         async with session.begin():
 
-            if not await usuarioEsValido(session, dto.usuarioId, permisoCode="COMENTAR"):
+            if not await usuarioEsValido(session, dto.usuarioId, permisoId = 21):
                 return func.HttpResponse(
                     json.dumps({"error": "Usuario no autorizado"}),
                     mimetype="application/json",
