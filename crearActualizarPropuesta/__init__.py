@@ -41,15 +41,18 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
     try:
         async with get_session() as session:
-            result = await session.execute(sp_call, dto.dict())
+            params = dto.dict()
+            params['Comentarios'] = int(params['Comentarios'])
+            result = await session.execute(sp_call, params)
+            await session.commit()
             rows = result.fetchall()
-            
+            print(f"Rows returned: {len(rows)}")
 
             resultList = []
             for row in rows:
                 rowDict = dict(row._mapping)
-                # Convierte checksum si existe y es bytes
-                if 'checksum' in rowDict and isinstance(rowDict['checksum'], bytes):
+                # Convierte checksum si existe
+                if 'checksum' in rowDict and isinstance(rowDict['checksum'], bytes): # para debug solamente
                     rowDict['checksum'] = bytesAString(rowDict['checksum'])
                 resultList.append(rowDict)
         logging.info(f"Result from SP: {resultList}")
@@ -69,19 +72,19 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 """
 ejemplo de uso:
 {
-  "PropuestaID": null,
+  "PropuestaID": 1,
   "CategoriaID": 3,
-  "Descripcion": "Propuesta para mejorar la infraestructura tecnológica",
+  "Descripcion": "Propuesta para mejorar la infraestructura",
   "ImgURL": "https://example.com/imagen.jpg",
   "FechaInicio": null,
   "FechaFin": "2025-12-31T23:59:59",
   "Comentarios": true,
   "TipoPropuestaID": 2,
-  "OrganizacionID": 162,
+  "OrganizacionID": 62,
   "SegmentosDirigidosJS": "[1,2,3]",
   "SegmentosImpactoJS": "[4,5]",
   "AdjuntosJS": "[{\"nombre\": \"documento1.pdf\", \"tipoDocumentoID\": 1, \"idLegal\": \"123456789\"}, {\"nombre\": \"documento2.pdf\", \"tipoDocumentoID\": 2, \"idLegal\": \"987654321\"}]",
-  "UsuarioAccion": 10,
+  "UsuarioAccion": 672,
   "EquipoOrigen": "ServidorApp01"
 }
 

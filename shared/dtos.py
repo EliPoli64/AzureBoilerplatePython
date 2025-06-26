@@ -31,7 +31,7 @@ class CrearActualizarPropuestaDTO(BaseModel):
     ImgURL: Optional[str] = None
     FechaInicio: Optional[str] = None  # ISO string o None
     FechaFin: Optional[str] = None
-    Comentarios: int
+    Comentarios: bool
     TipoPropuestaID: int
     OrganizacionID: int
     SegmentosDirigidosJS: str  # JSON string

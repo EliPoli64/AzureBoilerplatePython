@@ -58,7 +58,7 @@ class ComentarioPropuesta(Base):
 
 class EstadoComentario(Base):
     __tablename__ = 'pv_estadoComentarios'
-    id = Column(Integer, primary_key=True)
+    estadoComentId = Column(Integer, primary_key=True)
     nombre = Column(String)
 
 class Documento(Base):

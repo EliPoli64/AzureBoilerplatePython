@@ -1,8 +1,7 @@
 import json
+import random
 import azure.functions as func
 from datetime import datetime
-
-import sqlalchemy.ext.asyncio
 from shared.dtos import ComentarioDTO
 from shared.database import get_session
 from shared.models import (
@@ -35,7 +34,7 @@ def analizarContenido(titulo: str, cuerpo: str) -> dict:
     return {"valido": True, "sensible": bool(sensible)}
 
 
-async def usuarioEsValido(session: sqlalchemy.ext.asyncio.AsyncSession, usuarioId: int, permisoId: int) -> bool:
+async def usuarioEsValido(session, usuarioId: int) -> bool:
     stmt = (
         select(Usuario)
         .join(UsuarioPermiso)
@@ -45,9 +44,8 @@ async def usuarioEsValido(session: sqlalchemy.ext.asyncio.AsyncSession, usuarioI
             UsuarioPermiso.deleted == False,
         )
     )
-    print(str(permisoId)+" kjabsdchjkabsckjb")
-    if permisoId:
-        stmt = stmt.join(Permiso).where(Permiso.permissionId == permisoId)
+
+    stmt = stmt.join(Permiso).where(Permiso.permissionId == 9)
 
     result = await session.execute(stmt)
     return result.scalar() is not None
@@ -64,7 +62,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     async with get_session() as session:
         async with session.begin():
 
-            if not await usuarioEsValido(session, dto.usuarioId, permisoId = 21):
+            if not await usuarioEsValido(session, dto.usuarioId):
                 return func.HttpResponse(
                     json.dumps({"error": "Usuario no autorizado"}),
                     mimetype="application/json",
@@ -102,7 +100,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
 
             comentario = ComentarioPropuesta(
                 detalleComentarioId=detalle.detalleComentarioId,
-                estadoComentId=estado.id,
+                estadoComentId=estado.estadoComentId,
                 propuestaId=dto.propuestaId,
             )
             session.add(comentario)
@@ -113,7 +111,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
                 documento = Documento(
                     nombre=f"comentario_{detalle.detalleComentarioId}.txt",
                     fechaCreacion=ahora,
-                    tipoDocumentoID=99,
+                    tipoDocumentoID=11,
                     estadoDocumentoID=1,
                     ultimaModificacion=ahora,
                     esActual=True,
@@ -130,7 +128,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
                     iaEstadoID=1,
                     fechaComienzo=ahora,
                     fechaFinalizacion=ahora,
-                    infoid=detalle.detalleComentarioId,
+                    infoid=random.randint(1, 50),
                     contextoID=1,
                     documentoID=documentoId,
                 )
@@ -171,8 +169,8 @@ ejemplo de uso:
 {
   "titulo": "Opinión sobre la propuesta X",
   "cuerpo": "Este comentario incluye un documento sensible que debe ser analizado.",
-  "usuarioId": 42,
+  "usuarioId": 16,
   "organizacionId": 1,
-  "propuestaId": 40
+  "propuestaId": 6
 }
 """
