@@ -1,7 +1,7 @@
 import logging, json, os, pyodbc, azure.functions as func
 
 CONN = os.getenv("SqlConnectionString")
-SQL  = "EXEC dbo.sp_RevisarPropuesta @Id=?" #Holaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+SQL  = "EXEC dbo.sp_RevisarPropuesta @Id=?" 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     pid = req.route_params.get("id")
