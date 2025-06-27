@@ -16,7 +16,7 @@ from .database import Base
 
 class Usuario(Base):
     __tablename__ = "pv_usuarios"
-    
+    __table_args__ = {'extend_existing': True}
     userid = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(50), nullable=False)
     primerApellido = Column(String(50), nullable=False)
@@ -33,7 +33,7 @@ class Usuario(Base):
     
 class LlaveUsuario(Base):
     __tablename__ = 'pv_llavesUsuarios'
-    
+    __table_args__ = {'extend_existing': True}
     llaveUsuarioID = Column(Integer, primary_key=True, autoincrement=True)
     llaveCifrada = Column(VARBINARY(260), nullable=False)
     usuarioID = Column(Integer, ForeignKey('pv_usuarios.userid'), nullable=False)
@@ -55,7 +55,7 @@ class MediaFiles(Base):
 """
 class PropuestaVotacion(Base):
     __tablename__ = 'pv_propuestaVotacion'
-    
+    __table_args__ = {'extend_existing': True}
     propuestaVotacionID = Column(Integer, primary_key=True)
     votacionID = Column(Integer, ForeignKey('pv_votacion.votacionID'), nullable=False)
     propuestaID = Column(Integer, ForeignKey('pv_propuestas.propuestaid'), nullable=False)
@@ -69,7 +69,7 @@ class PropuestaVotacion(Base):
 
 class UsuarioVotacionPublica(Base):
     __tablename__ = 'pv_usuarioVotacionPublica'
-    
+    __table_args__ = {'extend_existing': True}
     usuarioVotacionPubID = Column(Integer, primary_key=True, autoincrement=True)
     usuarioID = Column(Integer, ForeignKey('pv_usuarios.userid'), nullable=False)
     respuestaParticipanteID = Column(Integer, ForeignKey('pv_respuestaParticipante.respuestaParticipanteID'), nullable=False)
@@ -83,7 +83,7 @@ class UsuarioVotacionPublica(Base):
 
 class Pregunta(Base):
     __tablename__ = "pv_preguntas"
-
+    __table_args__ = {'extend_existing': True}
     preguntaID = Column(Integer, primary_key=True, autoincrement=True)
     enunciado = Column(String(500), nullable=True)
     tipoPreguntaID = Column(Integer, nullable=False)
@@ -98,7 +98,7 @@ class Pregunta(Base):
 
 class PesoRespuesta(Base):
     __tablename__ = "pv_pesoRespuesta"
-
+    __table_args__ = {'extend_existing': True}
     pesoID = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(50), nullable=False)
     multiplicador = Column(Numeric(14, 2), nullable=True)
@@ -107,7 +107,7 @@ class PesoRespuesta(Base):
 
 class Respuesta(Base):
     __tablename__ = "pv_respuestas"
-
+    __table_args__ = {'extend_existing': True}
     respuestaID = Column(Integer, primary_key=True, autoincrement=True)
     preguntaID = Column(Integer, ForeignKey('pv_preguntas.preguntaID'), nullable=False)
     respuesta = Column(String(50), nullable=False)
@@ -121,7 +121,7 @@ class Respuesta(Base):
 
 class RespuestaParticipante(Base):
     __tablename__ = 'pv_respuestaParticipante'
-    
+    __table_args__ = {'extend_existing': True}
     respuestaParticipanteID = Column(Integer, primary_key=True, autoincrement=True)
     preguntaID = Column(Integer, ForeignKey('pv_preguntas.preguntaID'), nullable=False)
     respuestaID = Column(Integer, ForeignKey('pv_respuestas.respuestaID'), nullable=False)
@@ -138,7 +138,7 @@ class RespuestaParticipante(Base):
 
 class VotacionPregunta(Base):
     __tablename__ = 'pv_votacionPregunta'
-    
+    __table_args__ = {'extend_existing': True}
     votacionPreguntaID = Column(Integer, primary_key=True, autoincrement=True)
     votacionID = Column(Integer, ForeignKey('pv_votacion.votacionID'), nullable=False)
     preguntaID = Column(Integer, ForeignKey('pv_preguntas.preguntaID'), nullable=False)
@@ -148,7 +148,7 @@ class VotacionPregunta(Base):
 
 class Propuesta(Base):
     __tablename__ = "pv_propuestas"
-
+    __table_args__ = {'extend_existing': True}
     propuestaId = Column('propuestaid', Integer, primary_key=True, autoincrement=True)
     categoriaId = Column(Integer, nullable=False)
     descripcion = Column(String(200), nullable=True)
@@ -167,7 +167,7 @@ class Propuesta(Base):
 
 class DetalleComentarios(Base):
     __tablename__ = "pv_detalleComentarios"
-
+    __table_args__ = {'extend_existing': True}
     detalleComentarioId = Column(Integer, primary_key=True, autoincrement=True)
     titulo = Column(String(100), nullable=False)
     cuerpo = Column(String, nullable=False)
@@ -179,7 +179,7 @@ class DetalleComentarios(Base):
 
 class Votacion(Base):
     __tablename__ = "pv_votacion"
-
+    __table_args__ = {'extend_existing': True}
     votacionId = Column('votacionID', Integer, primary_key=True, autoincrement=True)
     tipoVotacionId = Column(Integer, nullable=False)
     titulo = Column(String(255), nullable=False)
@@ -198,7 +198,7 @@ class Votacion(Base):
     
 class ComentarioPropuesta(Base):
     __tablename__ = "pv_comentariosPropuesta"
-
+    __table_args__ = {'extend_existing': True}
     comentarioId = Column(Integer, primary_key=True, autoincrement=True)
     detalleComentarioId = Column(Integer, ForeignKey("pv_detalleComentarios.detalleComentarioId"), nullable=False)
     estadoComentId = Column(Integer, nullable=False)
@@ -210,7 +210,7 @@ class ComentarioPropuesta(Base):
 
 class Inversion(Base):
     __tablename__ = "pv_inversion"
-
+    __table_args__ = {'extend_existing': True}
     inversionId = Column(Integer, primary_key=True, autoincrement=True)
     proyectoId = Column(Integer, nullable=False)
     usuarioId = Column(Integer, nullable=False)
@@ -219,6 +219,7 @@ class Inversion(Base):
 
 class Documento(Base):
     __tablename__ = 'pv_documento'
+    __table_args__ = {'extend_existing': True}
     documentoID = Column(Integer, primary_key=True)
     nombre = Column(String)
     fechaCreacion = Column(DateTime)
@@ -230,6 +231,7 @@ class Documento(Base):
     checksum = Column(VARBINARY)
 class Log(Base):
     __tablename__ = 'pv_logs'
+    __table_args__ = {'extend_existing': True}
     logid = Column(Integer, primary_key=True)
     descripcion = Column(String)
     timestamp = Column(DateTime)
@@ -246,6 +248,7 @@ class Log(Base):
     logseveridadid = Column(Integer)
 class IaAnalisis(Base):
     __tablename__ = 'pv_iaAnalisis'
+    __table_args__ = {'extend_existing': True}
     analisisId = Column(Integer, primary_key=True)
     fechaSolicitud = Column(DateTime)
     iaEstadoID = Column(Integer)
@@ -259,13 +262,14 @@ class IaAnalisis(Base):
 
 class EstadoComentario(Base):
     __tablename__ = 'pv_estadoComentarios'
+    __table_args__ = {'extend_existing': True}
     estadoComentId = Column(Integer, primary_key=True)
     nombre = Column(String)
 
 class Permiso(Base):
 
     __tablename__ = 'pv_permissions'
-
+    __table_args__ = {'extend_existing': True}
     permissionId = Column(Integer, primary_key=True)
 
     code = Column(String)
@@ -274,8 +278,22 @@ class Permiso(Base):
 
 class UsuarioPermiso(Base):
     __tablename__ = 'pv_usuariosPermisos'
+    __table_args__ = {'extend_existing': True}
     permisoUsuarioId = Column(Integer, primary_key=True)
     userid = Column(Integer, ForeignKey('pv_usuarios.userid'))
     permisoId = Column(Integer, ForeignKey('pv_permissions.permissionId'))
     enabled = Column(Boolean)
     deleted = Column(Boolean)
+
+class Voto(Base):
+    __tablename__ = "pv_respuestaParticipante"
+    __table_args__ = {'extend_existing': True}
+    respuestaParticipanteID = Column(Integer, primary_key = True)
+    preguntaID = Column(Integer, nullable = False)
+    respuestaID = Column(Integer, nullable = False)
+    checksum = Column(VARBINARY, nullable = False)
+    valor = Column(String)
+    fechaRespuesta = Column(DateTime)
+    ncRespuesta = Column(VARBINARY)
+    tokenGUID = Column(String, unique=True)
+    PesoRespuesta = Column(Integer)
