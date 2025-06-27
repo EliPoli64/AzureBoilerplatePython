@@ -286,7 +286,22 @@ class Permiso(Base):
 
     code = Column(String)
 
-
+class RespuestaParticipante(Base):
+    _tablename_ = 'pv_respuestaParticipante'
+    
+    respuestaParticipanteID = Column(Integer, primary_key=True, autoincrement=True)
+    preguntaID = Column(Integer, ForeignKey('pv_preguntas.preguntaID'), nullable=False)
+    respuestaID = Column(Integer, ForeignKey('pv_respuestas.respuestaID'), nullable=False)
+    checksum = Column(VARBINARY(500), nullable=False)
+    valor = Column(String(500))
+    fechaRespuesta = Column(DateTime, nullable=False)
+    ncRespuesta = Column(VARBINARY(256), nullable=False)
+    tokenGUID = Column(String(36), nullable=False)  # Storing as string for UUID
+    pesoRespuesta = Column(Integer, ForeignKey('pv_pesoRespuesta.pesoID'), nullable=False)
+    
+    pregunta = relationship("Pregunta")
+    respuesta = relationship("Respuesta")
+    peso = relationship("PesoRespuesta", back_populates="respuestas_participantes")
 
 class UsuarioPermiso(Base):
     __tablename__ = 'pv_usuariosPermisos'
