@@ -70,3 +70,10 @@ class VotoDTO(BaseModel):
     respuestaID: int = Field(..., description = "ID de la respuesta con la que se contestará")
     valor: str = Field(..., max_length=100, description="Contenido de la respuesta")
     pesoRespuesta: int = Field(..., description = "ID del peso de la respuesta")
+
+class RevisarPropuestaDTO(BaseModel):
+    propuesta_id: int
+    revisor_id: int
+    resultado_final: str #'Aprobada', 'Rechazada'
+    comentarios_revision: Optional[str] = None
+    tipo_revision: str 
