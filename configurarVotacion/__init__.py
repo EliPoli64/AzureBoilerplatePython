@@ -7,7 +7,6 @@ from shared.dtos import CrearConfiguracionVotacionDTO
 import azure.functions as func
 from fastapi import Header, HTTPException
 
-
 async def validar_permiso(session, usuario_id: int, permiso_code: str, propuesta_id: int) -> bool:
     """
     Verifica que el usuario tiene el permiso especificado para modificar la propuesta dada.
