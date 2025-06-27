@@ -188,7 +188,6 @@ class Votacion(Base):
     fechaFin = Column(DateTime, nullable=False)
     estadoVotacionId = Column(Integer, nullable=False)
     ultimaModificacion = Column(DateTime, nullable=False)
-    encuestaId = Column(Integer, nullable=False)
     privada = Column(Boolean, nullable=False)
     esSecreta = Column(Boolean, nullable=False)
 

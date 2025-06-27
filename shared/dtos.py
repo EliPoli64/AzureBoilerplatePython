@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 class PropuestaDTO(BaseModel):
     id: int = Field(default=0)
@@ -40,6 +40,9 @@ class VotoDTO(BaseModel):
     respuestaID: int = Field(..., description = "ID de la respuesta con la que se contestará")
     valor: str = Field(..., max_length=100, description="Contenido de la respuesta")
     pesoRespuesta: int = Field(..., description = "ID del peso de la respuesta")
+    cedulaUsuario: str
+    contrasenia: SecretStr
+    prueba_vida: str
 
 class RevisarPropuestaDTO(BaseModel):
     propuesta_id: int
