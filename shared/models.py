@@ -202,7 +202,7 @@ class ComentarioPropuesta(Base):
     comentarioId = Column(Integer, primary_key=True, autoincrement=True)
     detalleComentarioId = Column(Integer, ForeignKey("pv_detalleComentarios.detalleComentarioId"), nullable=False)
     estadoComentId = Column(Integer, nullable=False)
-    propuestaId = Column(Integer, ForeignKey("pv_propuestas.propuestaId"), nullable=False)
+    propuestaId = Column(Integer, ForeignKey("pv_propuestas.propuestaid"), nullable=False)
 
     # Relación inversa
     detalleComentario = relationship("DetalleComentarios", back_populates="comentariosPropuesta")
@@ -217,5 +217,65 @@ class Inversion(Base):
     transaccionId = Column(Integer, nullable=False)
     organizacionId = Column(Integer, nullable=True)
 
-class Documento(Base): 
-     True
+class Documento(Base):
+    __tablename__ = 'pv_documento'
+    documentoID = Column(Integer, primary_key=True)
+    nombre = Column(String)
+    fechaCreacion = Column(DateTime)
+    tipoDocumentoID = Column(Integer)
+    estadoDocumentoID = Column(Integer)
+    ultimaModificacion = Column(DateTime)
+    esActual = Column(Boolean)
+    idLegal = Column(String)
+    checksum = Column(VARBINARY)
+class Log(Base):
+    __tablename__ = 'pv_logs'
+    logid = Column(Integer, primary_key=True)
+    descripcion = Column(String)
+    timestamp = Column(DateTime)
+    computador = Column(String)
+    usuario = Column(String)
+    trace = Column(String)
+    refId1 = Column(Integer)
+    refId2 = Column(Integer)
+    valor1 = Column(String)
+    valor2 = Column(String)
+    checksum = Column(VARBINARY)
+    tipologid = Column(Integer)
+    origenlogid = Column(Integer)
+    logseveridadid = Column(Integer)
+class IaAnalisis(Base):
+    __tablename__ = 'pv_iaAnalisis'
+    analisisId = Column(Integer, primary_key=True)
+    fechaSolicitud = Column(DateTime)
+    iaEstadoID = Column(Integer)
+    fechaComienzo = Column(DateTime)
+    fechaFinalizacion = Column(DateTime)
+    infoid = Column(Integer)
+    contextoID = Column(Integer)
+    documentoID = Column(Integer)
+
+
+
+class EstadoComentario(Base):
+    __tablename__ = 'pv_estadoComentarios'
+    estadoComentId = Column(Integer, primary_key=True)
+    nombre = Column(String)
+
+class Permiso(Base):
+
+    __tablename__ = 'pv_permissions'
+
+    permissionId = Column(Integer, primary_key=True)
+
+    code = Column(String)
+
+
+
+class UsuarioPermiso(Base):
+    __tablename__ = 'pv_usuariosPermisos'
+    permisoUsuarioId = Column(Integer, primary_key=True)
+    userid = Column(Integer, ForeignKey('pv_usuarios.userid'))
+    permisoId = Column(Integer, ForeignKey('pv_permissions.permissionId'))
+    enabled = Column(Boolean)
+    deleted = Column(Boolean)
