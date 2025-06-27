@@ -165,7 +165,35 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 """
-ejemplo de uso:
+Función principal: main(req: func.HttpRequest) -> func.HttpResponse
+Nombre: comentar
+
+Parámetros de entrada (esperados en el JSON del body):
+    - titulo (str): Título del comentario a registrar.
+    - cuerpo (str): Contenido textual del comentario. Puede incluir términos sensibles.
+    - usuarioId (int): ID del usuario que realiza el comentario.
+    - organizacionId (int): ID de la organización a la que pertenece el usuario.
+    - propuestaId (int): ID de la propuesta sobre la cual se hace el comentario.
+
+Lógica interna:
+    1. Se valida y deserializa el DTO de entrada usando ComentarioDTO.
+    2. Se verifica si el usuario tiene el permiso `permissionId = 9`, esté habilitado y no eliminado.
+    3. Se consulta si la propuesta correspondiente permite comentarios (`propuesta.comentarios == True`).
+    4. Se analiza el contenido del comentario para detectar si es sensible mediante expresión regular.
+        - Si es sensible, se cifra el contenido usando `Fernet` y se genera un hash con SHA-256.
+    5. Se crea un registro en las siguientes tablas:
+        - `DetalleComentarios` (comentario en sí)
+        - `ComentarioPropuesta` (vinculación con propuesta)
+        - `Documento` (solo si el comentario es sensible)
+        - `IaAnalisis` (si se creó documento)
+        - `Log` (registro general del evento)
+    6. Se devuelve una respuesta:
+        - 201 Created si el comentario fue aceptado y registrado.
+        - 400 Bad Request si el comentario es inválido o fue rechazado por alguna razón.
+        - 403 Forbidden si el usuario no está autorizado o la propuesta no acepta comentarios.
+
+Ejemplo de uso (varía con cada llenado de la BD, hay que seleccionar un usuario que tenga permisos de
+comentar en propuestas, esto se puede verificar con un simple SELECT en la BD):
 {
   "titulo": "Opinión sobre la propuesta X",
   "cuerpo": "Este comentario incluye un documento sensible que debe ser analizado.",
@@ -173,4 +201,15 @@ ejemplo de uso:
   "organizacionId": 1,
   "propuestaId": 6
 }
+
+SELECT para verificar usuarios:
+select * from pv_usuariosPermisos
+
+Bitácora de lo acontecido:
+- Se definió función de validación `usuarioEsValido` con join a `UsuarioPermiso` y `Permiso`.
+- Se añadió análisis de contenido (`analizarContenido`) con criterio de "documento sensible".
+- Se implementó cifrado con `Fernet` y generación de `checksum` con `hashlib.sha256`.
+- Se asegura persistencia en `pv_documento` y `pv_iaAnalisis` solo si el contenido es sensible.
+- Se crea un `Log` detallado de cada evento con trazabilidad de IDs y estado final.
+- Compatible con Azure Functions y SQLAlchemy async con manejo transaccional (`session.begin()`).
 """

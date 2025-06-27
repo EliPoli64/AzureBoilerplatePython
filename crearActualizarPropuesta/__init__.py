@@ -70,7 +70,43 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 """
-ejemplo de uso:
+Función principal: main(req: func.HttpRequest) -> func.HttpResponse
+Nombre: crearActualizarPropuesta
+
+Parámetros de entrada (esperados en el JSON del body):
+    - PropuestaID (int | null): ID de la propuesta (null si es nueva).
+    - CategoriaID (int): ID de la categoría de la propuesta.
+    - Descripcion (str): Texto descriptivo de la propuesta.
+    - ImgURL (str): URL de la imagen representativa.
+    - FechaInicio (str | null): Fecha de inicio en formato ISO 8601 (opcional).
+    - FechaFin (str): Fecha de finalización en formato ISO 8601.
+    - Comentarios (bool): Indica si se permiten comentarios en la propuesta.
+    - TipoPropuestaID (int): Tipo de propuesta según clasificación.
+    - OrganizacionID (int): ID de la organización que crea la propuesta.
+    - SegmentosDirigidosJS (str): JSON serializado de IDs de segmentos dirigidos.
+    - SegmentosImpactoJS (str): JSON serializado de IDs de segmentos de impacto.
+    - AdjuntosJS (str): JSON serializado de documentos adjuntos.
+    - UsuarioAccion (int): ID del usuario que realiza la acción.
+    - EquipoOrigen (str): Nombre del equipo o servidor de origen.
+
+Lógica interna:
+    1. Si la propuesta es nueva (`PropuestaID` es null), se inserta un nuevo registro en `pv_propuestas`.
+       - Se calcula el `checksum` con SHA-256.
+       - Se asigna estado inicial “En Revisión”.
+    2. Si la propuesta existe, se valida que el `UsuarioAccion` sea un proponente principal de la propuesta.
+       - Si no lo es, se lanza un error.
+       - Se actualiza la propuesta con los campos nuevos y se recalcula el `checksum`.
+    3. Se calcula el número de versión siguiente y se inserta en `pv_versionPropuesta`.
+    4. Si es una actualización, se marcan como eliminados (`deleted = 1`) los segmentos dirigidos anteriores.
+    5. Si se recibe `SegmentosImpactoJS`, se actualizan o insertan los segmentos en `pv_propuestaSegmentosImpacto` con `MERGE`.
+    6. Si se reciben `AdjuntosJS`, se insertan los documentos en `pv_documento`, se calcula `checksum`, y se vinculan a la propuesta.
+    7. Se crea una entrada en `pv_validacionPropuesta` asociando la nueva versión a un grupo validador.
+    8. Se registra en `pv_logs` el evento: creación o actualización de propuesta.
+    9. La transacción se confirma; si ocurre error, se revierte todo y se retorna mensaje de error.
+
+
+Ejemplo de uso (varía con cada llenado de la BD, hay que seleccionar un usuario que tenga permisos de
+modificar esa propuesta si no es nula, esto se puede verificar con un simple SELECT en la BD):
 {
   "PropuestaID": 1,
   "CategoriaID": 3,
@@ -88,4 +124,13 @@ ejemplo de uso:
   "EquipoOrigen": "ServidorApp01"
 }
 
+SELECT para verificar usuarios:
+select * from pv_propuestas
+
+Bitácora de lo acontecido:
+- Se implementó la ejecución del procedimiento almacenado `crearActualizarPropuesta` usando `sqlalchemy.text`.
+- Se incluyó soporte para codificación Base64 en campos tipo `bytes` para compatibilidad con JSON.
+- Se validan los campos usando Pydantic (`CrearActualizarPropuestaDTO`), retornando errores de validación detallados.
+- Se controla la transacción con `await session.commit()` y se captura cualquier excepción del proceso.
+- Se utiliza `get_session` para obtener una sesión `AsyncSession` con contexto seguro.
 """
