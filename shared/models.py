@@ -108,7 +108,7 @@ class UsuarioVotacionPublica(Base):
     votacionID = Column(Integer, ForeignKey('pv_votacion.votacionID'), nullable=False)
     
     usuario = relationship("Usuario", back_populates="votaciones_publicas")
-    respuesta = relationship("Voto")
+    respuesta = relationship("RespuestaParticipante")
     votacion = relationship("Votacion")
 
 class Pregunta(Base):
@@ -133,6 +133,7 @@ class PesoRespuesta(Base):
     pesoID = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(50), nullable=False)
     multiplicador = Column(Numeric(14, 2), nullable=True)
+    respuestas_participantes = relationship("RespuestaParticipante", back_populates="peso")
 
 
 class Respuesta(Base):
@@ -287,8 +288,8 @@ class Permiso(Base):
     code = Column(String)
 
 class RespuestaParticipante(Base):
-    _tablename_ = 'pv_respuestaParticipante'
-    
+    __tablename__ = 'pv_respuestaParticipante'
+    __table_args__ = {'extend_existing': True}
     respuestaParticipanteID = Column(Integer, primary_key=True, autoincrement=True)
     preguntaID = Column(Integer, ForeignKey('pv_preguntas.preguntaID'), nullable=False)
     respuestaID = Column(Integer, ForeignKey('pv_respuestas.respuestaID'), nullable=False)
@@ -312,7 +313,7 @@ class UsuarioPermiso(Base):
     enabled = Column(Boolean)
     deleted = Column(Boolean)
 
-class Voto(Base):
+"""class Voto(Base):
     __tablename__ = "pv_respuestaParticipante"
     __table_args__ = {'extend_existing': True}
     respuestaParticipanteID = Column(Integer, primary_key = True)
@@ -323,4 +324,4 @@ class Voto(Base):
     fechaRespuesta = Column(DateTime)
     ncRespuesta = Column(VARBINARY)
     tokenGUID = Column(String, unique=True)
-    pesoRespuesta = Column(Integer, ForeignKey("pv_pesoRespuesta.pesoID"),nullable=False)
+    pesoRespuesta = Column(Integer, ForeignKey("pv_pesoRespuesta.pesoID"),nullable=False)"""

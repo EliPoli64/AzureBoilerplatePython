@@ -201,7 +201,7 @@ async def obtenerRespuestasParticipantes(session, llaveCifrada, usuario) -> List
             .join(Pregunta, RespuestaParticipante.preguntaID == Pregunta.preguntaID)
             .join(Respuesta, RespuestaParticipante.respuestaID == Respuesta.respuestaID)
             .join(VotacionPregunta, VotacionPregunta.preguntaID == Pregunta.preguntaID)
-            .join(Votacion, Votacion.votacionId == VotacionPregunta.votacionID)
+            .join(Votacion, Votacion.votacionID == VotacionPregunta.votacionID)
         )
         result = await session.execute(query)
         respuestas = []

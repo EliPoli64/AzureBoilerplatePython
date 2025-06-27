@@ -1,7 +1,7 @@
 import azure.functions as func
 from shared.dtos import VotoDTO
 from shared.database import get_session
-from shared.models import Voto, Usuario, Log, LlaveUsuario, Documento, Pregunta, Respuesta, Votacion, VotacionPregunta, RespuestaParticipante
+from shared.models import Usuario, Log, LlaveUsuario, Documento, Pregunta, Respuesta, Votacion, VotacionPregunta, RespuestaParticipante
 from sqlalchemy import select, desc, text
 from sqlalchemy.orm import selectinload, Session, relationship, contains_eager
 from pydantic import ValidationError
@@ -95,7 +95,7 @@ async def getVotacionPorPreguntaID(session, pregunta_id: int) -> Optional[dict]:
     if not votacion_instance:
         return None 
     votacion_data = {
-        "votacionID": votacion_instance.votacionId,
+        "votacionID": votacion_instance.votacionID,
         "titulo": votacion_instance.titulo,
         "descripcion": votacion_instance.descripcion,
         "fechaInicio": votacion_instance.fechaInicio.isoformat(),
@@ -195,13 +195,13 @@ async def obtenerRespuestasParticipantes(session, llaveCifrada, usuario) -> List
                 RespuestaParticipante.respuestaParticipanteID,
                 RespuestaParticipante.preguntaID,
                 RespuestaParticipante.ncRespuesta,
-                Votacion.votacionId
+                Votacion.votacionID
             )
             .select_from(RespuestaParticipante)
             .join(Pregunta, RespuestaParticipante.preguntaID == Pregunta.preguntaID)
             .join(Respuesta, RespuestaParticipante.respuestaID == Respuesta.respuestaID)
             .join(VotacionPregunta, VotacionPregunta.preguntaID == Pregunta.preguntaID)
-            .join(Votacion, Votacion.votacionId == VotacionPregunta.votacionID)
+            .join(Votacion, Votacion.votacionID == VotacionPregunta.votacionID)
         )
         result = await session.execute(query)
         respuestas = []
@@ -210,7 +210,7 @@ async def obtenerRespuestasParticipantes(session, llaveCifrada, usuario) -> List
                 "respuesta_participante_id": row.respuestaParticipanteID,
                 "pregunta_id": row.preguntaID,
                 "nc_respuesta": row.ncRespuesta, 
-                "votacionID": row.votacionId
+                "votacionID": row.votacionID
             }
             if await verificarRespuesta(session, respuesta['nc_respuesta'], llaveCifrada, usuario):
                 respuestas.append(respuesta)
@@ -382,7 +382,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
                     }
                 )
             #async with session.begin():
-            voto = Voto(
+            voto = RespuestaParticipante(
                     preguntaID = dto.preguntaID,
                     respuestaID = dto.respuestaID,
                     checksum = hashlib.sha256("RespuestaParticipante".encode('utf-8')).digest(),
