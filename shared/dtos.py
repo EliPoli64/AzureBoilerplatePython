@@ -35,6 +35,35 @@ class CrearActualizarPropuestaDTO(BaseModel):
     UsuarioAccion: int
     EquipoOrigen: str
 
+class PreguntaRespuestaDTO(BaseModel):
+    pregunta: str
+    respuestas: List[str]  # Puede adaptarse a objetos si las respuestas son más complejas
+class PreguntaDTO(BaseModel):
+    preguntaID: int = Field(..., description="ID de la pregunta que se asocia a la votación")
+
+
+class CrearConfiguracionVotacionDTO(BaseModel):
+    usuarioID: int = Field(..., description="ID del usuario que configura la votación")
+    propuestaID: int = Field(..., description="ID de la propuesta asociada")
+    
+    titulo: str = Field(..., description="Título de la votación")
+    descripcion: Optional[str] = Field(None, description="Descripción de la votación")
+    fechaInicio: datetime = Field(..., description="Fecha de inicio de la votación")
+    fechaFin: datetime = Field(..., description="Fecha de fin de la votación")
+
+    tipoVotacionId: int = Field(..., description="Tipo de votación (única, múltiple, calificación, etc.)")
+    privada: bool = Field(..., description="Indica si la votación es privada")
+    esSecreta: bool = Field(..., description="Indica si la votación es secreta")
+
+    segmentosSeleccionados: List[int] = Field(default_factory=list, description="IDs de los segmentos poblacionales meta")
+
+    # Opcional si luego agregás implementación para estas restricciones
+    geografiaImpacto: Optional[str] = Field(None, description="Zona de impacto: nacional, regional, municipal, etc.")
+    restriccionesIP: Optional[List[str]] = Field(None, description="Restricciones de IP permitidas")
+    horariosPermitidos: Optional[List[str]] = Field(None, description="Horarios permitidos (HH:mm-HH:mm)")
+
+    preguntas: List[PreguntaDTO] = Field(..., description="Lista de preguntas por ID asociadas a la votación")
+
 class VotoDTO(BaseModel):
     preguntaID: int = Field(..., description = "ID de la pregunta a contestar")
     respuestaID: int = Field(..., description = "ID de la respuesta con la que se contestará")
@@ -50,3 +79,9 @@ class RevisarPropuestaDTO(BaseModel):
     resultado_final: str #'Aprobada', 'Rechazada'
     comentarios_revision: Optional[str] = None
     tipo_revision: str 
+
+class ListaVotosInputDTO(BaseModel):
+    cedula: str = Field(..., min_length=9, max_length=9, example="123456789")
+    contrasenna: SecretStr
+    prueba_vida: str = Field(..., description="UUID o URL del video de verificación")
+    token_mfa: Optional[str] = Field(None, min_length=6, max_length=6)
