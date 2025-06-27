@@ -53,6 +53,36 @@ class MediaFiles(Base):
     
     media_type = relationship("MediaTypes")
 """
+
+class Segmento(Base):
+    __tablename__ = 'pv_segmento'
+    __table_args__ = {'extend_existing': True}
+
+    segmentoID = Column(Integer, primary_key=True, autoincrement=True)
+    nombre = Column(String(50), nullable=False)
+    descripcion = Column(String(300), nullable=False)
+    enabled = Column(Boolean, nullable=False, default=True)
+    deleted = Column(Boolean, nullable=False, default=False)
+    fechaCreacion = Column(DateTime, nullable=False, default=datetime.utcnow)
+    usuarioID = Column(Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<Segmento(id={self.segmentoID}, nombre={self.nombre})>"
+
+class SegmentoPropuesta(Base):
+    __tablename__ = 'pv_propuestaSegmentosDirigidos'
+    __table_args__ = {'extend_existing': True}
+
+    propuestaSegmentoDirigoID = Column(Integer, primary_key=True, autoincrement=True)
+    propuestaID = Column(Integer, ForeignKey('pv_propuestas.propuestaid'), nullable=False)
+    segementoID = Column(Integer, ForeignKey('pv_segmento.segmentoID'), nullable=False)
+    usuarioID = Column(Integer, ForeignKey('pv_usuarios.userid'), nullable=False)
+    deleted = Column(Boolean, nullable=False, default=False)
+    checksum = Column(VARBINARY(256), nullable=False)
+
+    def __repr__(self):
+        return f"<SegmentoPropuesta(propuestaID={self.propuestaID}, segmentoID={self.segementoID})>"
+
 class PropuestaVotacion(Base):
     __tablename__ = 'pv_propuestaVotacion'
     __table_args__ = {'extend_existing': True}
@@ -78,7 +108,7 @@ class UsuarioVotacionPublica(Base):
     votacionID = Column(Integer, ForeignKey('pv_votacion.votacionID'), nullable=False)
     
     usuario = relationship("Usuario", back_populates="votaciones_publicas")
-    respuesta = relationship("RespuestaParticipante")
+    respuesta = relationship("Voto")
     votacion = relationship("Votacion")
 
 class Pregunta(Base):
@@ -99,11 +129,11 @@ class Pregunta(Base):
 class PesoRespuesta(Base):
     __tablename__ = "pv_pesoRespuesta"
     __table_args__ = {'extend_existing': True}
+
     pesoID = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(50), nullable=False)
     multiplicador = Column(Numeric(14, 2), nullable=True)
 
-    respuestas_participantes = relationship("RespuestaParticipante", back_populates="peso")
 
 class Respuesta(Base):
     __tablename__ = "pv_respuestas"
@@ -118,23 +148,6 @@ class Respuesta(Base):
     checksum = Column(VARBINARY(256), nullable=False)
 
     pregunta = relationship("Pregunta", back_populates="respuestas")
-
-class RespuestaParticipante(Base):
-    __tablename__ = 'pv_respuestaParticipante'
-    __table_args__ = {'extend_existing': True}
-    respuestaParticipanteID = Column(Integer, primary_key=True, autoincrement=True)
-    preguntaID = Column(Integer, ForeignKey('pv_preguntas.preguntaID'), nullable=False)
-    respuestaID = Column(Integer, ForeignKey('pv_respuestas.respuestaID'), nullable=False)
-    checksum = Column(VARBINARY(500), nullable=False)
-    valor = Column(String(500))
-    fechaRespuesta = Column(DateTime, nullable=False)
-    ncRespuesta = Column(VARBINARY(256), nullable=False)
-    tokenGUID = Column(String(36), nullable=False)  # Storing as string for UUID
-    pesoRespuesta = Column(Integer, ForeignKey('pv_pesoRespuesta.pesoID'), nullable=False)
-    
-    pregunta = relationship("Pregunta")
-    respuesta = relationship("Respuesta")
-    peso = relationship("PesoRespuesta", back_populates="respuestas_participantes")
 
 class VotacionPregunta(Base):
     __tablename__ = 'pv_votacionPregunta'
@@ -180,7 +193,7 @@ class DetalleComentarios(Base):
 class Votacion(Base):
     __tablename__ = "pv_votacion"
     __table_args__ = {'extend_existing': True}
-    votacionId = Column('votacionID', Integer, primary_key=True, autoincrement=True)
+    votacionID = Column('votacionID', Integer, primary_key=True, autoincrement=True)
     tipoVotacionId = Column(Integer, nullable=False)
     titulo = Column(String(255), nullable=False)
     descripcion = Column(String, nullable=True)  # nvarchar(max)
@@ -188,7 +201,6 @@ class Votacion(Base):
     fechaFin = Column(DateTime, nullable=False)
     estadoVotacionId = Column(Integer, nullable=False)
     ultimaModificacion = Column(DateTime, nullable=False)
-    encuestaId = Column(Integer, nullable=False)
     privada = Column(Boolean, nullable=False)
     esSecreta = Column(Boolean, nullable=False)
 
