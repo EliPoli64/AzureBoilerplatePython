@@ -1,6 +1,5 @@
-from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel, Field
+from typing import Optional
+from pydantic import BaseModel, Field, SecretStr
 
 class PropuestaDTO(BaseModel):
     id: int = Field(default=0)
@@ -70,6 +69,9 @@ class VotoDTO(BaseModel):
     respuestaID: int = Field(..., description = "ID de la respuesta con la que se contestará")
     valor: str = Field(..., max_length=100, description="Contenido de la respuesta")
     pesoRespuesta: int = Field(..., description = "ID del peso de la respuesta")
+    cedulaUsuario: str
+    contrasenia: SecretStr
+    prueba_vida: str
 
 class RevisarPropuestaDTO(BaseModel):
     propuesta_id: int
@@ -77,3 +79,9 @@ class RevisarPropuestaDTO(BaseModel):
     resultado_final: str #'Aprobada', 'Rechazada'
     comentarios_revision: Optional[str] = None
     tipo_revision: str 
+
+class ListaVotosInputDTO(BaseModel):
+    cedula: str = Field(..., min_length=9, max_length=9, example="123456789")
+    contrasenna: SecretStr
+    prueba_vida: str = Field(..., description="UUID o URL del video de verificación")
+    token_mfa: Optional[str] = Field(None, min_length=6, max_length=6)
