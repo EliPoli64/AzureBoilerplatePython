@@ -86,3 +86,22 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=500
         )
+    
+
+    """
+    Ejemplo de uso:
+    {
+    "propuesta_id": 2,         
+    "revisor_id": 2,           
+    "resultado_final": "Rechazada", 
+    "comentarios_revision": "Contenido duplicado detectado por el análisis de IA.",
+    "tipo_revision": "Combinada"
+    }
+    {
+    "propuesta_id": 1,         
+    "revisor_id": 1,           
+    "resultado_final": "Aprobada", 
+    "comentarios_revision": "Contenido duplicado detectado por el análisis de IA.",
+    "tipo_revision": "Combinada"
+    }
+    """

@@ -289,11 +289,11 @@ class Voto(Base):
     __tablename__ = "pv_respuestaParticipante"
     __table_args__ = {'extend_existing': True}
     respuestaParticipanteID = Column(Integer, primary_key = True)
-    preguntaID = Column(Integer, nullable = False)
-    respuestaID = Column(Integer, nullable = False)
+    preguntaID = Column(Integer, ForeignKey("pv_preguntas.preguntaID"), nullable = False)
+    respuestaID = Column(Integer, ForeignKey("pv_respuestas.respuestaID"),nullable = False)
     checksum = Column(VARBINARY, nullable = False)
     valor = Column(String)
     fechaRespuesta = Column(DateTime)
     ncRespuesta = Column(VARBINARY)
     tokenGUID = Column(String, unique=True)
-    PesoRespuesta = Column(Integer)
+    pesoRespuesta = Column(Integer, ForeignKey("pv_pesoRespuesta.pesoID"),nullable=False)

@@ -25,7 +25,7 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
                     checksum = hashlib.sha256("RespuestaParticipante".encode('utf-8')).digest(),
                     valor = dto.valor,
                     fechaRespuesta = datetime.now(),
-                    ncRespuesta = hashlib.sha256("Respuesta".encode('utf-8')).digest(),
+                    ncRespuesta = hashlib.sha256("Respuesta".encode('utf-8')).digest(), ##Debo cambiar a que se encripte con el ID de usuario
                     tokenGUID = str(uuid.uuid4()),
                     pesoRespuesta = dto.pesoRespuesta
                 )
@@ -40,3 +40,13 @@ async def main(req: func.HttpRequest) -> func.HttpResponse:
             mimetype="application/json",
             status_code=500,
         )
+    
+    """
+    Ejemplo de uso:
+    {
+    "preguntaID": 1,        
+    "respuestaID": 1,       
+    "valor": "Mejorar el transporte público",           
+    "pesoRespuesta": 2    
+    }
+    """
